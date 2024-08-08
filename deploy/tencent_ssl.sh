@@ -38,15 +38,8 @@ tencent_ssl_deploy() {
   # NOTE: no new cert id returned from UpdateCertificateInstance+cert_data
   # so it's necessary to upload cert first then UpdateCertificateInstance+new_cert_id
   if [ -n "${old_cert_id}" ]; then
-    _payload="{\"OldCertificateId\":\"$old_cert_id\",\"CertificateId\":\"$cert_id\",\"ResourceTypes\":[\"clb\",\"cdn\",\"waf\",\"live\",\"ddos\",\"teo\",\"apigateway\",\"vod\",\"tke\",\"tcb\",\"tse\"]}"
+    _payload="{\"OldCertificateId\":\"$old_cert_id\",\"CertificateId\":\"$cert_id\",\"ResourceTypes\":[\"clb\"],\"ResourceTypesRegions\":[{\"ResourceType\":\"clb\",\"Regions\":[\"ap-chengdu\"]}],\"ExpiringNotificationSwitch\":1}"
     if ! tencent_api_request_ssl "UpdateCertificateInstance" "$_payload" "RequestId"; then
-      return 1
-    fi
-    _payload="{\"CertificateId\":\"$old_cert_id\"}"
-    if ! tencent_api_request_ssl "DeleteCertificate" "$_payload" "RequestId"; then
-      _err "Can not delete old certificate: $old_cert_id"
-      # NOTE: non-exist old cert id will not break from UpdateCertificateInstance
-      # break it here
       return 1
     fi
   fi
